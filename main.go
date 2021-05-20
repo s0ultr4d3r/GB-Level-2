@@ -3,6 +3,8 @@ package main
 import (
 	"errors"
 	"fmt"
+	"math"
+	"os"
 	"runtime"
 	"strconv"
 	"time"
@@ -33,8 +35,26 @@ func mixIt() {
 	defer panicHandler()
 	overloadList()
 }
+
+func createMilFiles() {
+	for i := 0; i < int(math.Pow(10, 6)); i++ {
+		emptyFile, err := os.Create("emptyFile" + strconv.Itoa(i))
+		if err != nil {
+			if v := recover(); v != nil {
+				buff := make([]byte, 1024)
+				runtime.Stack(buff, false)
+				moment := time.Now()
+				fmt.Printf("Limit files reached: %v, %s\n Time: %s\n", v, buff, moment)
+			}
+		}
+		defer emptyFile.Close()
+	}
+}
+
 func main() {
 	mixIt()
 	fmt.Println(list)
 	fmt.Println("panic overcoming")
+
+	createMilFiles()
 }
